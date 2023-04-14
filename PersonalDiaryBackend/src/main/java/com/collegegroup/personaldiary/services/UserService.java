@@ -10,6 +10,8 @@ public interface UserService {
 	public UserModel createUser(UserModel userModel);
 	
 	public UserModel getUserById(Integer userId);
+	
+	public UserModel getUserByEmailAndPassword(String email, String password);
 
 	public ApiResponseUserModels getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode);
 	

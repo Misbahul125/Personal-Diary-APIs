@@ -38,6 +38,6 @@ public class User {
 	private String imageURL;
 	
 	private String about;
-	
+
 }
 

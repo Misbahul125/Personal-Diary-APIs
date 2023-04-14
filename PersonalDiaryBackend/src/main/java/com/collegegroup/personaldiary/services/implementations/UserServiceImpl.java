@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.collegegroup.personaldiary.entities.User;
+import com.collegegroup.personaldiary.exceptions.CredentialException;
 import com.collegegroup.personaldiary.exceptions.ResourceNotFoundException;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
@@ -63,6 +64,27 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
 
 		return this.modelMapper.map(user, UserModel.class);
+	}
+	
+	@Override
+	public UserModel getUserByEmailAndPassword(String email, String password) {
+
+		User user = this.userRepository.findByEmail(email);
+				//.orElseThrow((() -> new ResourceNotFoundException("User", "user email", email)));
+		
+		if (user != null) {
+			if (user.getPassword().equals(password)) {
+				return this.modelMapper.map(user, UserModel.class);
+			}
+			else {
+				throw new CredentialException("Incorrect Password");
+			}
+		}
+		else {
+			throw new ResourceNotFoundException("User", "user email", email);
+		}
+
+		
 	}
 
 	@Override

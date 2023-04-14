@@ -3,6 +3,7 @@ package com.collegegroup.personaldiary.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.collegegroup.personaldiary.utils.AppConstants;
 
 import jakarta.validation.Valid;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -48,6 +50,16 @@ public class UserController {
 
 		ApiResponseUserModel apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.OK.value(),
 				"User Fetched Successfully", userModel);
+
+		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
+	}
+	
+	@GetMapping("/login")
+	public ResponseEntity<ApiResponseUserModel> getUserByEmailAndPassword(@RequestBody UserModel userModel) {
+		UserModel user = this.userService.getUserByEmailAndPassword(userModel.getEmail(), userModel.getPassword());
+
+		ApiResponseUserModel apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.OK.value(),
+				"User Fetched Successfully", user);
 
 		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
 	}
