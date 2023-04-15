@@ -29,8 +29,7 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private ModelMapper modelMapper;
-	
-	
+
 //	@Override
 //	public UserModel registerNewUser(UserModel userModel) {
 //		
@@ -50,18 +49,25 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserModel createUser(UserModel userModel) {
-		
+
+		User user = getUserByEmail(userModel.getEmail());
+
+		if (user != null) {	
+			user = null;
+			throw new CredentialException("This email ID already exist. Please try to login.");
+		}
+
 		try {
 			userModel.setPassword(AESHelper.encrypt(userModel.getPassword()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		User user = this.modelMapper.map(userModel, User.class);
+		User createdUser = this.modelMapper.map(userModel, User.class);
 
-		user = this.userRepository.save(user);
+		createdUser = this.userRepository.save(createdUser);
 
-		return this.modelMapper.map(user, UserModel.class);
+		return this.modelMapper.map(createdUser, UserModel.class);
 	}
 
 	@Override
@@ -72,73 +78,64 @@ public class UserServiceImpl implements UserService {
 
 		return this.modelMapper.map(user, UserModel.class);
 	}
-	
+
 	@Override
 	public UserModel getUserByEmailAndPassword(String email, String password) {
 
 		User user = this.userRepository.findByEmail(email);
-				//.orElseThrow((() -> new ResourceNotFoundException("User", "user email", email)));
-		
+		// .orElseThrow((() -> new ResourceNotFoundException("User", "user email",
+		// email)));
+
 		if (user != null) {
-			
-			//encrypting password
+
+			// encrypting password
 			String encryptedPassword = "";
 			try {
 				encryptedPassword = AESHelper.encrypt(password);
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			if (user.getPassword().equals(encryptedPassword)) {
 				return this.modelMapper.map(user, UserModel.class);
-			}
-			else {
+			} else {
 				throw new CredentialException("Incorrect Password");
 			}
-			
-		}
-		else {
+
+		} else {
 			throw new ResourceNotFoundException("User", "user email", email);
 		}
-		
+
 	}
-	
+
 	@Override
 	public boolean resetPassword(String email, String password) {
-		
+
 		User user = getUserByEmail(email);
-		
+
 		if (user != null) {
-			
+
 			try {
 				user.setPassword(AESHelper.encrypt(password));
 				this.userRepository.save(user);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-		}
-		else {
+
+		} else {
 			throw new ResourceNotFoundException("User", "user email", email);
 		}
-		
+
 		return true;
-		
+
 	}
-	
+
 	@Override
 	public User getUserByEmail(String email) {
-		
-		User user = null;
 
-		try {
-			user = this.userRepository.findByEmail(email);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new CredentialException("This email ID already exists. Please try to login.");
-		}	
-		
+		User user = this.userRepository.findByEmail(email);
+
 		return user;
 
 	}
@@ -181,7 +178,7 @@ public class UserServiceImpl implements UserService {
 		// not
 		User userFromDB = this.userRepository.findById(userModel.getId())
 				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userModel.getId().toString())));
-		
+
 		try {
 			userModel.setPassword(AESHelper.encrypt(userModel.getPassword()));
 		} catch (Exception e) {

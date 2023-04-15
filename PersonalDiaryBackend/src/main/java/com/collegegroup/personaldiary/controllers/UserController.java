@@ -34,19 +34,11 @@ public class UserController {
 	// POST-create user
 	@PostMapping("/")
 	public ResponseEntity<ApiResponseUserModel> createUser(@Valid @RequestBody UserModel userModel) {
-		
-		ApiResponseUserModel apiResponseUserModel = null;
-		
-		User user = this.userService.getUserByEmail(userModel.getEmail());
-		
-		if (user == null) {
-			
-			UserModel createdUser = this.userService.createUser(userModel);
+				
+		UserModel createdUser = this.userService.createUser(userModel);
 
-			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
-					"User Created Successfully", createdUser);
-			
-		}
+		ApiResponseUserModel apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
+				"User Created Successfully", createdUser);
 		
 		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.CREATED);
 
