@@ -1,5 +1,6 @@
 package com.collegegroup.personaldiary.services;
 
+import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
 
@@ -13,7 +14,9 @@ public interface UserService {
 	
 	public UserModel getUserByEmailAndPassword(String email, String password);
 	
-	public boolean isUserExist(String email);
+	public boolean resetPassword(String email, String password);
+	
+	public User getUserByEmail(String email);
 
 	public ApiResponseUserModels getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode);
 	

@@ -105,7 +105,30 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public boolean isUserExist(String email) {
+	public boolean resetPassword(String email, String password) {
+		
+		User user = getUserByEmail(email);
+		
+		if (user != null) {
+			
+			try {
+				user.setPassword(AESHelper.encrypt(password));
+				this.userRepository.save(user);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		else {
+			throw new ResourceNotFoundException("User", "user email", email);
+		}
+		
+		return true;
+		
+	}
+	
+	@Override
+	public User getUserByEmail(String email) {
 		
 		User user = null;
 
@@ -116,7 +139,7 @@ public class UserServiceImpl implements UserService {
 			throw new CredentialException("This email ID already exists. Please try to login.");
 		}	
 		
-		return false;
+		return user;
 
 	}
 

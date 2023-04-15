@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModel;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
@@ -36,7 +37,9 @@ public class UserController {
 		
 		ApiResponseUserModel apiResponseUserModel = null;
 		
-		if (!this.userService.isUserExist(userModel.getEmail())) {
+		User user = this.userService.getUserByEmail(userModel.getEmail());
+		
+		if (user == null) {
 			
 			UserModel createdUser = this.userService.createUser(userModel);
 
@@ -69,6 +72,24 @@ public class UserController {
 				"User Fetched Successfully", user);
 
 		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
+	}
+	
+	@PostMapping("/resetPassword")
+	public ResponseEntity<ApiResponseUserModel> resetPassword(@RequestBody UserModel userModel) {
+		boolean status = this.userService.resetPassword(userModel.getEmail(), userModel.getPassword());
+
+		ApiResponseUserModel apiResponseUserModel = null;
+		
+		if(status) {
+			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.OK.value(),
+					"Password Updated Successfully", null);
+			
+			return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
+		}
+		
+		apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.EXPECTATION_FAILED.value(),
+				"Something went wrong. Please try again later.", null);
+		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.EXPECTATION_FAILED);
 	}
 
 	// Multiple user

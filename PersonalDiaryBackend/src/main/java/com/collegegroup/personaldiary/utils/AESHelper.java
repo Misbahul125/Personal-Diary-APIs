@@ -30,7 +30,7 @@ public class AESHelper {
         byte[] encValue = cipher.doFinal(valueToEnc.getBytes());
         byte[] encryptedByteValue = new Base64().encode(encValue);
         String s = new String(encryptedByteValue);
-        System.out.println("Encrypted Value :: " + s);
+        //System.out.println("Encrypted Value :: " + s);
 
         return s;
     }
@@ -45,7 +45,7 @@ public class AESHelper {
         byte[] enctVal = cipher.doFinal(decodedBytes);
 
         String s = new String(enctVal);
-        System.out.println("Decrypted Value :: " + s);
+        //System.out.println("Decrypted Value :: " + s);
         return s;
     }
 
