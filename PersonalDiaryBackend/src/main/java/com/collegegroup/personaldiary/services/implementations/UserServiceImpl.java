@@ -19,6 +19,7 @@ import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
 import com.collegegroup.personaldiary.repositories.UserRepository;
 import com.collegegroup.personaldiary.services.UserService;
+import com.collegegroup.personaldiary.utils.AESHelper;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -49,6 +50,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserModel createUser(UserModel userModel) {
+		
+		try {
+			userModel.setPassword(AESHelper.encrypt(userModel.getPassword()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		User user = this.modelMapper.map(userModel, User.class);
 
@@ -73,17 +80,27 @@ public class UserServiceImpl implements UserService {
 				//.orElseThrow((() -> new ResourceNotFoundException("User", "user email", email)));
 		
 		if (user != null) {
-			if (user.getPassword().equals(password)) {
+			
+			//encrypting password
+			String encryptedPassword = "";
+			try {
+				encryptedPassword = AESHelper.encrypt(password);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if (user.getPassword().equals(encryptedPassword)) {
 				return this.modelMapper.map(user, UserModel.class);
 			}
 			else {
 				throw new CredentialException("Incorrect Password");
 			}
+			
 		}
 		else {
 			throw new ResourceNotFoundException("User", "user email", email);
 		}
-
 		
 	}
 	
@@ -141,6 +158,12 @@ public class UserServiceImpl implements UserService {
 		// not
 		User userFromDB = this.userRepository.findById(userModel.getId())
 				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userModel.getId().toString())));
+		
+		try {
+			userModel.setPassword(AESHelper.encrypt(userModel.getPassword()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		userFromDB = this.modelMapper.map(userModel, User.class);
 
