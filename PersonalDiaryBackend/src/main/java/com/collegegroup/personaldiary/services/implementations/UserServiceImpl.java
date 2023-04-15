@@ -86,6 +86,22 @@ public class UserServiceImpl implements UserService {
 
 		
 	}
+	
+	@Override
+	public boolean isUserExist(String email) {
+		
+		User user = null;
+
+		try {
+			user = this.userRepository.findByEmail(email);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new CredentialException("This email ID already exists. Please try to login.");
+		}	
+		
+		return false;
+
+	}
 
 	@Override
 	public ApiResponseUserModels getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode) {

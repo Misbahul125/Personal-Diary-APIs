@@ -12,10 +12,13 @@ public interface UserService {
 	public UserModel getUserById(Integer userId);
 	
 	public UserModel getUserByEmailAndPassword(String email, String password);
+	
+	public boolean isUserExist(String email);
 
 	public ApiResponseUserModels getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode);
 	
 	public UserModel updateUser(UserModel userModel);
 	
 	public void deleteUserById(Integer userId);
+
 }

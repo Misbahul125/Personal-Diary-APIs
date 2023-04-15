@@ -33,13 +33,20 @@ public class UserController {
 	// POST-create user
 	@PostMapping("/")
 	public ResponseEntity<ApiResponseUserModel> createUser(@Valid @RequestBody UserModel userModel) {
+		
+		ApiResponseUserModel apiResponseUserModel = null;
+		
+		if (!this.userService.isUserExist(userModel.getEmail())) {
+			
+			UserModel createdUser = this.userService.createUser(userModel);
 
-		UserModel createdUser = this.userService.createUser(userModel);
-
-		ApiResponseUserModel apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
-				"User Created Successfully", createdUser);
-
+			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
+					"User Created Successfully", createdUser);
+			
+		}
+		
 		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.CREATED);
+
 	}
 
 	// GET-get user
@@ -54,7 +61,7 @@ public class UserController {
 		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
 	}
 	
-	@GetMapping("/login")
+	@PostMapping("/login")
 	public ResponseEntity<ApiResponseUserModel> getUserByEmailAndPassword(@RequestBody UserModel userModel) {
 		UserModel user = this.userService.getUserByEmailAndPassword(userModel.getEmail(), userModel.getPassword());
 
