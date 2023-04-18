@@ -12,6 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.collegegroup.personaldiary.emailHelper.EmailHelper;
+import com.collegegroup.personaldiary.emailHelper.EmailRequest;
+import com.collegegroup.personaldiary.emailHelper.EmailVerificationResponse;
 import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.exceptions.CredentialException;
 import com.collegegroup.personaldiary.exceptions.ResourceNotFoundException;
@@ -46,6 +49,19 @@ public class UserServiceImpl implements UserService {
 //		return this.modelMapper.map(newUser, UserModel.class);
 //		
 //	}
+	
+	@Override
+	public EmailVerificationResponse sendOTP(EmailRequest emailRequest) {
+		
+		EmailHelper emailHelper = new EmailHelper();
+		
+		String code = emailHelper.sendEmail(emailRequest);
+		
+		EmailVerificationResponse emailVerificationResponse = new EmailVerificationResponse(code, "Veification Code is sent successfully !!");
+		
+		return emailVerificationResponse;
+		
+	}
 
 	@Override
 	public UserModel createUser(UserModel userModel) {

@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.collegegroup.personaldiary.emailHelper.ApiResponseEmailVerification;
+import com.collegegroup.personaldiary.emailHelper.EmailRequest;
+import com.collegegroup.personaldiary.emailHelper.EmailVerificationResponse;
 import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModel;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
@@ -30,6 +34,18 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@PostMapping("/sendOtp")
+	public ResponseEntity<ApiResponseEmailVerification> sendOTP(@RequestBody EmailRequest emailRequest) {
+		
+		EmailVerificationResponse emailVerificationResponse  = this.userService.sendOTP(emailRequest);
+
+		ApiResponseEmailVerification apiResponseEmailVerification = new ApiResponseEmailVerification(true, HttpStatus.CREATED.value(),
+				"Email Sent Successfully", emailVerificationResponse);
+		
+		return new ResponseEntity<ApiResponseEmailVerification>(apiResponseEmailVerification, HttpStatus.CREATED);
+		
+	}
 
 	// POST-create user
 	@PostMapping("/")

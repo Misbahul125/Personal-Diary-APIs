@@ -1,5 +1,7 @@
 package com.collegegroup.personaldiary.services;
 
+import com.collegegroup.personaldiary.emailHelper.EmailRequest;
+import com.collegegroup.personaldiary.emailHelper.EmailVerificationResponse;
 import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
@@ -7,6 +9,8 @@ import com.collegegroup.personaldiary.payloads.user.UserModel;
 public interface UserService {
 	
 	//public UserModel registerNewUser(UserModel userModel);
+	
+	public EmailVerificationResponse sendOTP(EmailRequest emailRequest);
 	
 	public UserModel createUser(UserModel userModel);
 	

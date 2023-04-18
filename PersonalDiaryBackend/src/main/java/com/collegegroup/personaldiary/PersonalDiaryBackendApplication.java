@@ -16,5 +16,10 @@ public class PersonalDiaryBackendApplication {
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}
+	
+//	@Bean
+//	public JavaMailSender javaMailSender() {
+//		return new JavaMailSenderImpl();
+//	}
 
 }
