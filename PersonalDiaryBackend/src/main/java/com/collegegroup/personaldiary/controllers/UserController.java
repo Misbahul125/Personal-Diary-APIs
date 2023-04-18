@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.collegegroup.personaldiary.emailHelper.ApiResponseEmailVerification;
 import com.collegegroup.personaldiary.emailHelper.EmailRequest;
 import com.collegegroup.personaldiary.emailHelper.EmailVerificationResponse;
-import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModel;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
@@ -36,7 +34,7 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/sendOtp")
-	public ResponseEntity<ApiResponseEmailVerification> sendOTP(@RequestBody EmailRequest emailRequest) {
+	public ResponseEntity<ApiResponseEmailVerification> sendOTP(@Valid @RequestBody EmailRequest emailRequest) {
 		
 		EmailVerificationResponse emailVerificationResponse  = this.userService.sendOTP(emailRequest);
 
@@ -49,15 +47,29 @@ public class UserController {
 
 	// POST-create user
 	@PostMapping("/")
-	public ResponseEntity<ApiResponseUserModel> createUser(@Valid @RequestBody UserModel userModel) {
-				
-		UserModel createdUser = this.userService.createUser(userModel);
-
-		ApiResponseUserModel apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
-				"User Created Successfully", createdUser);
+	public ResponseEntity<ApiResponseUserModel> createUser(
+			@Valid @RequestBody UserModel userModel,
+			@RequestParam(value = "originalCode", required = true) Integer originalCode,
+			@RequestParam(value = "userCode", required = true) Integer userCode) {
 		
-		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.CREATED);
-
+		ApiResponseUserModel apiResponseUserModel = null;
+		
+		if (originalCode.equals(userCode)) {
+			
+			UserModel createdUser = this.userService.createUser(userModel);
+			
+			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
+					"User Created Successfully", createdUser);
+			
+			return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.CREATED);
+		}
+		else {
+			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.BAD_REQUEST.value(),
+					"Invalid OTP!!", null);
+			
+			return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.BAD_REQUEST);
+		}
+		
 	}
 
 	// GET-get user
@@ -83,21 +95,45 @@ public class UserController {
 	}
 	
 	@PostMapping("/resetPassword")
-	public ResponseEntity<ApiResponseUserModel> resetPassword(@RequestBody UserModel userModel) {
-		boolean status = this.userService.resetPassword(userModel.getEmail(), userModel.getPassword());
-
+	public ResponseEntity<ApiResponseUserModel> resetPassword(
+			@RequestBody UserModel userModel,
+			@RequestParam(value = "originalCode", required = true) Integer originalCode,
+			@RequestParam(value = "userCode", required = true) Integer userCode) {
+		
 		ApiResponseUserModel apiResponseUserModel = null;
 		
-		if(status) {
-			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.OK.value(),
-					"Password Updated Successfully", null);
+		System.out.println(originalCode);
+		System.out.println(userCode);
+		
+		if (originalCode.equals(userCode)) {
 			
-			return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
+			System.out.println("Equal");
+			
+			boolean isSuccess = this.userService.resetPassword(userModel.getEmail(), userModel.getPassword());
+			
+			if(isSuccess) {
+				apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.OK.value(),
+						"Password Updated Successfully", null);
+				
+				return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
+			}
+			else {
+				apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.EXPECTATION_FAILED.value(),
+						"Something went wrong. Please try again later.", null);
+				return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.EXPECTATION_FAILED);
+			}
+			
+		} else {
+			
+			System.out.println("Not Equal");
+
+			apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.BAD_REQUEST.value(),
+					"Invalid OTP!!", null);
+			
+			return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.BAD_REQUEST);
+			
 		}
 		
-		apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.EXPECTATION_FAILED.value(),
-				"Something went wrong. Please try again later.", null);
-		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.EXPECTATION_FAILED);
 	}
 
 	// Multiple user
