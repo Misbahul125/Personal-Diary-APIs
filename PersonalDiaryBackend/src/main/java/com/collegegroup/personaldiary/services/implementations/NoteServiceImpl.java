@@ -120,7 +120,7 @@ public class NoteServiceImpl implements NoteService {
 
 		if (pageNotes.getNumber() >= pageNotes.getTotalPages()) {
 
-			apiResponseNoteModels.setMessage("No more note(s) found for this user");
+			apiResponseNoteModels.setMessage("No more note(s) found");
 			apiResponseNoteModels.setNoteModels(null);
 
 		}
@@ -240,10 +240,10 @@ public class NoteServiceImpl implements NoteService {
 		if (noteModel.getDescription() != null && !noteModel.getDescription().isEmpty())
 			note.setDescription(noteModel.getDescription());
 
-		if (noteModel.getUser() != null && noteModel.getUser().getId() != null
-				&& noteModel.getUser().getId() != note.getUser().getId()) {
-			User user = this.userRepository.findById(noteModel.getUser().getId()).orElseThrow(
-					() -> new ResourceNotFoundException("Note", "UserId", noteModel.getUser().getId().toString()));
+		if (noteModel.getUserModel() != null && noteModel.getUserModel().getId() != null
+				&& noteModel.getUserModel().getId() != note.getUser().getId()) {
+			User user = this.userRepository.findById(noteModel.getUserModel().getId()).orElseThrow(
+					() -> new ResourceNotFoundException("Note", "UserId", noteModel.getUserModel().getId().toString()));
 			note.setUser(user);
 		}
 		

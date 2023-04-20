@@ -1,4 +1,4 @@
-package com.collegegroup.personaldiary.payloads.Note;
+package com.collegegroup.personaldiary.payloads.ToDo;
 
 import java.util.Date;
 
@@ -13,19 +13,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class NoteModel {
 
-	private Integer noteId;
+public class ToDoModel {
+
+	private Integer toDoId;
 	
-	private String title;
-	
-	private String description;
+	private String text;
 	
 	private Date createdAt;
 	
 	private Date updatedAt;
 	
-	//@JsonIgnore
 	private UserModel userModel;
 	
 }
