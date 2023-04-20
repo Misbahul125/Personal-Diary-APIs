@@ -142,7 +142,7 @@ public class UserController {
 			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
 			@RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_USER_ID, required = false) String sortBy,
-			@RequestParam(value = "sortMode", defaultValue = AppConstants.SORT_MODE, required = false) Integer sortMode) {
+			@RequestParam(value = "sortMode", defaultValue = AppConstants.SORT_MODE_ASCENDING, required = false) Integer sortMode) {
 
 		ApiResponseUserModels apiResponseUserModels = this.userService.getAllUsers(pageNumber, pageSize, sortBy,
 				sortMode);
