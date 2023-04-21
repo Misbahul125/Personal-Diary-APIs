@@ -31,6 +31,8 @@ public class ToDo {
 	
 	private Date updatedAt;
 	
+	private Boolean isCompleted;
+	
 	@ManyToOne
 	private User user;
 	

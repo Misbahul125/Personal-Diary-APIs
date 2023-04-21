@@ -11,7 +11,7 @@ public interface ToDoRepository extends JpaRepository<ToDo, Integer> {
 
 	Page<ToDo> findByUser(User user, Pageable pageable);
 	
-	Page<ToDo> findByUserAndTextContaining(User user, String searchKey, Pageable pageable);
+	Page<ToDo> findByUserAndTextContaining(User user, String text, Pageable pageable);
 	
 	
 }

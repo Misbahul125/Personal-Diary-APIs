@@ -19,6 +19,8 @@ public interface ToDoService {
 	
 	public ToDoModel updateToDo(ToDoModel toDoModel);
 	
+	public ToDoModel updateCompletionStatus(Integer toDoId);
+	
 	public void deleteToDo(Integer toDoId);
 	
 }

@@ -101,7 +101,7 @@ public class ToDoController {
 	}
 
 	@PutMapping("/todo")
-	public ResponseEntity<ApiResponseToDoModel> updatePost(@RequestBody ToDoModel toDoModel) {
+	public ResponseEntity<ApiResponseToDoModel> updateToDo(@RequestBody ToDoModel toDoModel) {
 
 		ToDoModel updatedToDo = this.toDoService.updateToDo(toDoModel);
 
@@ -111,9 +111,28 @@ public class ToDoController {
 		return new ResponseEntity<ApiResponseToDoModel>(apiResponseToDoModel, HttpStatus.OK);
 
 	}
+	
+	@PutMapping("/todo/{todoId}/updateStatus")
+	public ResponseEntity<ApiResponseToDoModel> updateCompletionStatus(@PathVariable("todoId") Integer toDoId) {
+		
+		String status = "";
+
+		ToDoModel updatedToDo = this.toDoService.updateCompletionStatus(toDoId);
+		
+		if (updatedToDo.getIsCompleted())
+			status = "complete";
+		else
+			status = "incomplete";
+
+		ApiResponseToDoModel apiResponseToDoModel = new ApiResponseToDoModel(true, HttpStatus.OK.value(),
+				"Todo is marked as "+status, updatedToDo);
+
+		return new ResponseEntity<ApiResponseToDoModel>(apiResponseToDoModel, HttpStatus.OK);
+
+	}
 
 	@DeleteMapping("/todo/{todoId}")
-	public ResponseEntity<ApiResponseToDoModel> deletePost(@PathVariable("todoId") Integer toDoId) {
+	public ResponseEntity<ApiResponseToDoModel> deleteToDo(@PathVariable("todoId") Integer toDoId) {
 
 		this.toDoService.deleteToDo(toDoId);
 

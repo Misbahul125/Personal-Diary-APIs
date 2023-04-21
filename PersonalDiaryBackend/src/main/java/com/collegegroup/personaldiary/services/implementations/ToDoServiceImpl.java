@@ -43,6 +43,7 @@ public class ToDoServiceImpl implements ToDoService {
 		ToDo toDo = this.modelMapper.map(toDoModel, ToDo.class);
 		toDo.setCreatedAt(new Date());
 		toDo.setUpdatedAt(null);
+		toDo.setIsCompleted(false);
 		toDo.setUser(user);
 
 		ToDo newToDo = this.toDoRepository.save(toDo);
@@ -130,9 +131,9 @@ public class ToDoServiceImpl implements ToDoService {
 	}
 
 	@Override
-	public ApiResponseToDoModels searchToDosByUserAndText(Integer userId, String searchKey, Integer pageNumber, Integer pageSize,
-			String sortBy, Integer sortMode) {
-		
+	public ApiResponseToDoModels searchToDosByUserAndText(Integer userId, String searchKey, Integer pageNumber,
+			Integer pageSize, String sortBy, Integer sortMode) {
+
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
 
@@ -170,9 +171,15 @@ public class ToDoServiceImpl implements ToDoService {
 
 		ToDo toDo = this.toDoRepository.findById(toDoModel.getToDoId())
 				.orElseThrow(() -> new ResourceNotFoundException("ToDo", "ToDoId", toDoModel.getToDoId().toString()));
-		
+
 		if (toDoModel.getText() != null && !toDoModel.getText().isEmpty())
 			toDo.setText(toDoModel.getText());
+		
+		if (toDoModel.getIsCompleted() != null)
+			toDo.setIsCompleted(toDoModel.getIsCompleted());
+		else
+			//if not passed in request, then update it with the existing value
+			toDo.setIsCompleted(toDo.getIsCompleted());
 
 		if (toDoModel.getUser() != null && toDoModel.getUser().getId() != null
 				&& toDoModel.getUser().getId() != toDo.getUser().getId()) {
@@ -180,13 +187,35 @@ public class ToDoServiceImpl implements ToDoService {
 					() -> new ResourceNotFoundException("Note", "UserId", toDoModel.getUser().getId().toString()));
 			toDo.setUser(user);
 		}
-		
+
 		toDo.setUpdatedAt(new Date());
 
 		ToDo updatedToDo = this.toDoRepository.save(toDo);
 
 		return this.modelMapper.map(updatedToDo, ToDoModel.class);
+
+	}
+
+	@Override
+	public ToDoModel updateCompletionStatus(Integer toDoId) {
+
+		ToDo toDo = this.toDoRepository.findById(toDoId)
+				.orElseThrow(() -> new ResourceNotFoundException("ToDo", "ToDoId", toDoId.toString()));
+
+		// if not completed, update status as complete
+		if (!toDo.getIsCompleted())
+			toDo.setIsCompleted(true);
 		
+		// else update status to incomplete
+		else
+			toDo.setIsCompleted(false);
+			
+		toDo.setUpdatedAt(new Date());
+		
+		ToDo updatedToDo = this.toDoRepository.save(toDo);
+
+		return this.modelMapper.map(updatedToDo, ToDoModel.class);
+
 	}
 
 	@Override
@@ -194,9 +223,9 @@ public class ToDoServiceImpl implements ToDoService {
 
 		ToDo toDo = this.toDoRepository.findById(toDoId)
 				.orElseThrow(() -> new ResourceNotFoundException("ToDo", "ToDoId", toDoId.toString()));
-		
+
 		this.toDoRepository.delete(toDo);
-		
+
 	}
 
 }

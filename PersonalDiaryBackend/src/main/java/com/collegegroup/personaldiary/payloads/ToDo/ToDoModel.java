@@ -24,6 +24,8 @@ public class ToDoModel {
 	
 	private Date updatedAt;
 	
+	private Boolean isCompleted;
+	
 	private UserModel user;
 	
 }
