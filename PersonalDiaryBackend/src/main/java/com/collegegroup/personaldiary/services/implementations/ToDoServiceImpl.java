@@ -130,8 +130,11 @@ public class ToDoServiceImpl implements ToDoService {
 	}
 
 	@Override
-	public ApiResponseToDoModels searchToDosByText(String searchKey, Integer pageNumber, Integer pageSize,
+	public ApiResponseToDoModels searchToDosByUserAndText(Integer userId, String searchKey, Integer pageNumber, Integer pageSize,
 			String sortBy, Integer sortMode) {
+		
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
 
 		// sorting format
 		Sort sort = (sortMode == 0) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -140,7 +143,7 @@ public class ToDoServiceImpl implements ToDoService {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
 		// retrieving paged data items
-		Page<ToDo> pageToDos = this.toDoRepository.findByTextContaining(searchKey, pageable);
+		Page<ToDo> pageToDos = this.toDoRepository.findByUserAndTextContaining(user, searchKey, pageable);
 
 		List<ToDo> allToDos = pageToDos.getContent();
 
@@ -171,10 +174,10 @@ public class ToDoServiceImpl implements ToDoService {
 		if (toDoModel.getText() != null && !toDoModel.getText().isEmpty())
 			toDo.setText(toDoModel.getText());
 
-		if (toDoModel.getUserModel() != null && toDoModel.getUserModel().getId() != null
-				&& toDoModel.getUserModel().getId() != toDo.getUser().getId()) {
-			User user = this.userRepository.findById(toDoModel.getUserModel().getId()).orElseThrow(
-					() -> new ResourceNotFoundException("Note", "UserId", toDoModel.getUserModel().getId().toString()));
+		if (toDoModel.getUser() != null && toDoModel.getUser().getId() != null
+				&& toDoModel.getUser().getId() != toDo.getUser().getId()) {
+			User user = this.userRepository.findById(toDoModel.getUser().getId()).orElseThrow(
+					() -> new ResourceNotFoundException("Note", "UserId", toDoModel.getUser().getId().toString()));
 			toDo.setUser(user);
 		}
 		

@@ -14,13 +14,13 @@ public interface NoteService {
 	
 	public ApiResponseNoteModels getAllNotes(Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode);
 	
-	public ApiResponseNoteModels searchNotesByTitle(String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
+	public ApiResponseNoteModels searchNotesByUserAndTitle(Integer userId, String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
 			Integer sortMode);
 	
-	public ApiResponseNoteModels searchNotesByDescription(String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
+	public ApiResponseNoteModels searchNotesByUserAndDescription(Integer userId, String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
 			Integer sortMode);
 	
-	public ApiResponseNoteModels searchNotesByTitleOrDescription(String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
+	public ApiResponseNoteModels searchNotesByUserAndTitleOrDescription(Integer userId, String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
 			Integer sortMode);
 	
 	public NoteModel updateNote(NoteModel noteModel);

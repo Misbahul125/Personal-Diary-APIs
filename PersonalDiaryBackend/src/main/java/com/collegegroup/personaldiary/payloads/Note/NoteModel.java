@@ -25,7 +25,6 @@ public class NoteModel {
 	
 	private Date updatedAt;
 	
-	//@JsonIgnore
-	private UserModel userModel;
+	private UserModel user;
 	
 }

@@ -14,7 +14,7 @@ public interface ToDoService {
 	
 	public ApiResponseToDoModels getAllToDos(Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode);
 	
-	public ApiResponseToDoModels searchToDosByText(String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
+	public ApiResponseToDoModels searchToDosByUserAndText(Integer userId, String searchKey, Integer pageNumber, Integer pageSize, String sortBy,
 			Integer sortMode);
 	
 	public ToDoModel updateToDo(ToDoModel toDoModel);

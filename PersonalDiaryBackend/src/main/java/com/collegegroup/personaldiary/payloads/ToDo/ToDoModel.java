@@ -24,6 +24,6 @@ public class ToDoModel {
 	
 	private Date updatedAt;
 	
-	private UserModel userModel;
+	private UserModel user;
 	
 }

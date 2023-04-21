@@ -81,45 +81,48 @@ public class NoteController {
 	}
 
 	// search notes
-	@GetMapping("/notes/searchByTitle")
-	public ResponseEntity<ApiResponseNoteModels> searchNotesByTitle(
+	@GetMapping("/user/{userId}/notes/searchByTitle")
+	public ResponseEntity<ApiResponseNoteModels> searchNotesByTitleAndUser(
+			@PathVariable Integer userId,
 			@RequestParam(value = "searchKey", required = true) String searchKey,
 			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
 			@RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_CREATED_AT, required = false) String sortBy,
 			@RequestParam(value = "sortMode", defaultValue = AppConstants.SORT_MODE_DESCENDING, required = false) Integer sortMode) {
 
-		ApiResponseNoteModels apiResponseNoteModels = this.noteService.searchNotesByTitle(searchKey, pageNumber, pageSize,
+		ApiResponseNoteModels apiResponseNoteModels = this.noteService.searchNotesByUserAndTitle(userId, searchKey, pageNumber, pageSize,
 				sortBy, sortMode);
 
 		return new ResponseEntity<ApiResponseNoteModels>(apiResponseNoteModels, HttpStatus.OK);
 
 	}
 	
-	@GetMapping("/notes/searchByDescription")
-	public ResponseEntity<ApiResponseNoteModels> searchNotesByDescription(
+	@GetMapping("/user/{userId}/notes/searchByDescription")
+	public ResponseEntity<ApiResponseNoteModels> searchNotesByDescriptionAndUser(
+			@PathVariable Integer userId,
 			@RequestParam(value = "searchKey", required = true) String searchKey,
 			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
 			@RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_CREATED_AT, required = false) String sortBy,
 			@RequestParam(value = "sortMode", defaultValue = AppConstants.SORT_MODE_DESCENDING, required = false) Integer sortMode) {
 
-		ApiResponseNoteModels apiResponseNoteModels = this.noteService.searchNotesByDescription(searchKey, pageNumber, pageSize,
+		ApiResponseNoteModels apiResponseNoteModels = this.noteService.searchNotesByUserAndDescription(userId, searchKey, pageNumber, pageSize,
 				sortBy, sortMode);
 
 		return new ResponseEntity<ApiResponseNoteModels>(apiResponseNoteModels, HttpStatus.OK);
 
 	}
 	
-	@GetMapping("/notes/searchAll")
-	public ResponseEntity<ApiResponseNoteModels> searchNotesByTitleOrDescription(
+	@GetMapping("/user/{userId}/notes/searchAll")
+	public ResponseEntity<ApiResponseNoteModels> searchNotesByUserAndTitleOrDescription(
+			@PathVariable Integer userId,
 			@RequestParam(value = "searchKey", required = true) String searchKey,
 			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
 			@RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_CREATED_AT, required = false) String sortBy,
 			@RequestParam(value = "sortMode", defaultValue = AppConstants.SORT_MODE_DESCENDING, required = false) Integer sortMode) {
 
-		ApiResponseNoteModels apiResponseNoteModels = this.noteService.searchNotesByTitleOrDescription(searchKey, pageNumber, pageSize,
+		ApiResponseNoteModels apiResponseNoteModels = this.noteService.searchNotesByUserAndTitleOrDescription(userId, searchKey, pageNumber, pageSize,
 				sortBy, sortMode);
 
 		return new ResponseEntity<ApiResponseNoteModels>(apiResponseNoteModels, HttpStatus.OK);

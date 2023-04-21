@@ -49,7 +49,7 @@ public class ToDoController {
 		ToDoModel toDoModel = this.toDoService.getToDoById(toDoId);
 
 		ApiResponseToDoModel apiResponseToDoModel = new ApiResponseToDoModel(true, HttpStatus.OK.value(),
-				"ToDo Fetched Successfully", t);
+				"ToDo Fetched Successfully", toDoModel);
 
 		return new ResponseEntity<ApiResponseToDoModel>(apiResponseToDoModel, HttpStatus.OK);
 
@@ -84,15 +84,16 @@ public class ToDoController {
 	}
 
 	// search notes
-	@GetMapping("/todos/searchByText")
-	public ResponseEntity<ApiResponseToDoModels> searchToDosByText(
+	@GetMapping("/user/{userId}/todos/searchByText")
+	public ResponseEntity<ApiResponseToDoModels> searchToDosByUserAndText(
+			@PathVariable Integer userId,
 			@RequestParam(value = "searchKey", required = true) String searchKey,
 			@RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
 			@RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_CREATED_AT, required = false) String sortBy,
 			@RequestParam(value = "sortMode", defaultValue = AppConstants.SORT_MODE_DESCENDING, required = false) Integer sortMode) {
 
-		ApiResponseToDoModels apiResponseToDoModels = this.toDoService.searchToDosByText(searchKey, pageNumber, pageSize,
+		ApiResponseToDoModels apiResponseToDoModels = this.toDoService.searchToDosByUserAndText(userId, searchKey, pageNumber, pageSize,
 				sortBy, sortMode);
 
 		return new ResponseEntity<ApiResponseToDoModels>(apiResponseToDoModels, HttpStatus.OK);

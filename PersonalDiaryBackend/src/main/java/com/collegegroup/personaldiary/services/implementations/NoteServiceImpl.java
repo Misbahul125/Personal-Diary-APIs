@@ -130,8 +130,11 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public ApiResponseNoteModels searchNotesByTitle(String searchKey, Integer pageNumber, Integer pageSize,
+	public ApiResponseNoteModels searchNotesByUserAndTitle(Integer userId, String searchKey, Integer pageNumber, Integer pageSize,
 			String sortBy, Integer sortMode) {
+		
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
 
 		// sorting format
 		Sort sort = (sortMode == 0) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -140,7 +143,7 @@ public class NoteServiceImpl implements NoteService {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
 		// retrieving paged data items
-		Page<Note> pageNotes = this.noteRepository.findByTitleContaining(searchKey, pageable);
+		Page<Note> pageNotes = this.noteRepository.findByUserAndTitleContaining(user, searchKey, pageable);
 
 		List<Note> allNotes = pageNotes.getContent();
 
@@ -163,8 +166,11 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public ApiResponseNoteModels searchNotesByDescription(String searchKey, Integer pageNumber, Integer pageSize,
+	public ApiResponseNoteModels searchNotesByUserAndDescription(Integer userId, String searchKey, Integer pageNumber, Integer pageSize,
 			String sortBy, Integer sortMode) {
+		
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
 
 		// sorting format
 		Sort sort = (sortMode == 0) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -173,7 +179,7 @@ public class NoteServiceImpl implements NoteService {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
 		// retrieving paged data items
-		Page<Note> pageNotes = this.noteRepository.findByDescriptionContaining(searchKey, pageable);
+		Page<Note> pageNotes = this.noteRepository.findByUserAndDescriptionContaining(user, searchKey, pageable);
 
 		List<Note> allNotes = pageNotes.getContent();
 
@@ -196,8 +202,11 @@ public class NoteServiceImpl implements NoteService {
 	}
 	
 	@Override
-	public ApiResponseNoteModels searchNotesByTitleOrDescription(String searchKey, Integer pageNumber, Integer pageSize,
+	public ApiResponseNoteModels searchNotesByUserAndTitleOrDescription(Integer userId, String searchKey, Integer pageNumber, Integer pageSize,
 			String sortBy, Integer sortMode) {
+		
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
 
 		// sorting format
 		Sort sort = (sortMode == 0) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -206,7 +215,7 @@ public class NoteServiceImpl implements NoteService {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
 		// retrieving paged data items
-		Page<Note> pageNotes = this.noteRepository.findByTitleOrDescription(searchKey, searchKey, pageable);
+		Page<Note> pageNotes = this.noteRepository.findByUserAndTitleOrDescription(user, searchKey, searchKey, pageable);
 
 		List<Note> allNotes = pageNotes.getContent();
 
@@ -240,10 +249,10 @@ public class NoteServiceImpl implements NoteService {
 		if (noteModel.getDescription() != null && !noteModel.getDescription().isEmpty())
 			note.setDescription(noteModel.getDescription());
 
-		if (noteModel.getUserModel() != null && noteModel.getUserModel().getId() != null
-				&& noteModel.getUserModel().getId() != note.getUser().getId()) {
-			User user = this.userRepository.findById(noteModel.getUserModel().getId()).orElseThrow(
-					() -> new ResourceNotFoundException("Note", "UserId", noteModel.getUserModel().getId().toString()));
+		if (noteModel.getUser() != null && noteModel.getUser().getId() != null
+				&& noteModel.getUser().getId() != note.getUser().getId()) {
+			User user = this.userRepository.findById(noteModel.getUser().getId()).orElseThrow(
+					() -> new ResourceNotFoundException("Note", "UserId", noteModel.getUser().getId().toString()));
 			note.setUser(user);
 		}
 		
