@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.collegegroup.personaldiary.payloads.Note.ApiResponseNoteModel;
-import com.collegegroup.personaldiary.payloads.Note.ApiResponseNoteModels;
-import com.collegegroup.personaldiary.payloads.Note.NoteModel;
 import com.collegegroup.personaldiary.payloads.ToDo.ApiResponseToDoModel;
 import com.collegegroup.personaldiary.payloads.ToDo.ApiResponseToDoModels;
 import com.collegegroup.personaldiary.payloads.ToDo.ToDoModel;

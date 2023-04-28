@@ -1,16 +1,22 @@
 package com.collegegroup.personaldiary.services.implementations;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.collegegroup.personaldiary.emailHelper.EmailHelper;
 import com.collegegroup.personaldiary.emailHelper.EmailRequest;
@@ -21,14 +27,22 @@ import com.collegegroup.personaldiary.exceptions.ResourceNotFoundException;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
 import com.collegegroup.personaldiary.repositories.UserRepository;
+import com.collegegroup.personaldiary.services.FileService;
 import com.collegegroup.personaldiary.services.UserService;
 import com.collegegroup.personaldiary.utils.AESHelper;
+import com.collegegroup.personaldiary.utils.AppConstants;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private FileService fileService;
+
+	@Value("${project.image}")
+	private String path;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -49,18 +63,19 @@ public class UserServiceImpl implements UserService {
 //		return this.modelMapper.map(newUser, UserModel.class);
 //		
 //	}
-	
+
 	@Override
 	public EmailVerificationResponse sendOTP(EmailRequest emailRequest) {
-		
+
 		EmailHelper emailHelper = new EmailHelper();
-		
+
 		String code = emailHelper.sendEmail(emailRequest);
-		
-		EmailVerificationResponse emailVerificationResponse = new EmailVerificationResponse(code, "Veification Code is sent successfully !!");
-		
+
+		EmailVerificationResponse emailVerificationResponse = new EmailVerificationResponse(code,
+				"Veification Code is sent successfully !!");
+
 		return emailVerificationResponse;
-		
+
 	}
 
 	@Override
@@ -68,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
 		User user = getUserByEmail(userModel.getEmail());
 
-		if (user != null) {	
+		if (user != null) {
 			user = null;
 			throw new CredentialException("This email ID already exist. Please try to login.");
 		}
@@ -195,13 +210,20 @@ public class UserServiceImpl implements UserService {
 		User userFromDB = this.userRepository.findById(userModel.getId())
 				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userModel.getId().toString())));
 
-		try {
-			userModel.setPassword(AESHelper.encrypt(userModel.getPassword()));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		if (userModel.getFullName() != null && !userModel.getFullName().isEmpty())
+			userFromDB.setFullName(userModel.getFullName());
 
-		userFromDB = this.modelMapper.map(userModel, User.class);
+		if (userModel.getEmail() != null && !userModel.getEmail().isEmpty())
+			userFromDB.setEmail(userModel.getEmail());
+
+		if (userModel.getAbout() != null && !userModel.getAbout().isEmpty())
+			userFromDB.setAbout(userModel.getAbout());
+
+		if (userModel.getRole() != null && !userModel.getRole().isEmpty())
+			userFromDB.setRole(userModel.getRole());
+
+		if (userModel.isActive() != userFromDB.isActive())
+			userFromDB.setActive(userModel.isActive());
 
 		User updatedUser = this.userRepository.save(userFromDB);
 
@@ -215,6 +237,78 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
 
 		this.userRepository.delete(userFromDB);
+	}
+
+	// images
+
+	@Override
+	public UserModel createUserProfileImage(Integer userId, MultipartFile multipartFile) throws IOException {
+
+		User user = this.userRepository.findById(userId)
+				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
+
+		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
+			try {
+				boolean isImageDeleted = this.fileService.deleteImage(path, user.getImageURL());
+
+				if (!isImageDeleted)
+					return null;
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+		String fileName = this.fileService.uploadImageFile(path, multipartFile);
+
+//		System.out.println(AppConstants.USER_PROFILE_IMAGE_PATH);
+//		System.out.println(fileName);
+
+		user.setImageURL(fileName);
+		User updatedUser = this.userRepository.save(user);
+
+		return this.modelMapper.map(updatedUser, UserModel.class);
+
+	}
+
+	@Override
+	public InputStream getUserProfileImage(Integer userId) throws Exception {
+
+		User user = this.userRepository.findById(userId)
+				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
+
+		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
+
+			InputStream inputStream = this.fileService.getResource(path, user.getImageURL());
+
+			return inputStream;
+
+		}
+
+		return null;
+
+	}
+	
+	public boolean deleteUserProfileImage(Integer userId) throws Exception {
+		
+		User user = this.userRepository.findById(userId)
+				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
+		
+		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
+
+			boolean isImageDeleted = this.fileService.deleteImage(path, user.getImageURL());
+
+			if(!isImageDeleted)
+				return false;
+
+		}
+		
+		user.setImageURL(null);
+		this.userRepository.save(user);
+		
+		return true;
+		
 	}
 
 }

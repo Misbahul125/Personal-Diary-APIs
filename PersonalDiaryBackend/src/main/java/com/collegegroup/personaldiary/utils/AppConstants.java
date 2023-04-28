@@ -1,5 +1,9 @@
 package com.collegegroup.personaldiary.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+
 public class AppConstants {
 
 	public static final String PAGE_NUMBER = "0";
@@ -12,6 +16,9 @@ public class AppConstants {
 	
 	public static final String SORT_MODE_ASCENDING = "0";
 	public static final String SORT_MODE_DESCENDING = "1";
+	
+	//public static final String USER_PROFILE_IMAGE_PATH = "profileImages";
+	//public static final String USER_GALLERY_IMAGE_PATH = environment.getProperty("project.image").concat("galleryImages");
 
 	public static final Integer ADMIN_USER = 501;
 	public static final Integer NORMAL_USER = 502;

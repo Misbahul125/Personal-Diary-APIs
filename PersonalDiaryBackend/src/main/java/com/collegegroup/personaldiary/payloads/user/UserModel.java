@@ -29,7 +29,7 @@ public class UserModel {
 	@Email(message = "Email is invalid !!")
 	private String email;
 	
-	@NotEmpty(message = "Password cannot be empty !!")
+	//@NotEmpty(message = "Password cannot be empty !!")
 	@Size(min = 8, message = "Password should have at least 8 characters !!")
 	private String password;
 	

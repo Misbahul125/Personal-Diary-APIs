@@ -130,7 +130,7 @@ public class NoteController {
 	}
 
 	@PutMapping("/note")
-	public ResponseEntity<ApiResponseNoteModel> updatePost(@RequestBody NoteModel noteModel) {
+	public ResponseEntity<ApiResponseNoteModel> updateNote(@RequestBody NoteModel noteModel) {
 
 		NoteModel updatedNote = this.noteService.updateNote(noteModel);
 
@@ -142,7 +142,7 @@ public class NoteController {
 	}
 
 	@DeleteMapping("/note/{noteId}")
-	public ResponseEntity<ApiResponseNoteModel> deletePost(@PathVariable Integer noteId) {
+	public ResponseEntity<ApiResponseNoteModel> deleteNote(@PathVariable Integer noteId) {
 
 		this.noteService.deleteNote(noteId);
 
