@@ -142,7 +142,7 @@ public class NoteController {
 	}
 
 	@DeleteMapping("/note/{noteId}")
-	public ResponseEntity<ApiResponseNoteModel> deleteNote(@PathVariable Integer noteId) {
+	public ResponseEntity<ApiResponseNoteModel> delete(@PathVariable Integer noteId) {
 
 		this.noteService.deleteNote(noteId);
 
