@@ -1,14 +1,10 @@
 package com.collegegroup.personaldiary.controllers;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +26,6 @@ import com.collegegroup.personaldiary.payloads.user.UserModel;
 import com.collegegroup.personaldiary.services.UserService;
 import com.collegegroup.personaldiary.utils.AppConstants;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @CrossOrigin("*")
@@ -184,7 +179,7 @@ public class UserController {
 			@RequestParam(value = "userId", required = true) Integer userId,
 			@RequestParam(value = "image", required = true) MultipartFile multipartFile) throws IOException {
 
-		UserModel userModel = this.userService.createUserProfileImage(userId, multipartFile);
+		UserModel userModel = this.userService.uploadUserProfileImage(userId, multipartFile);
 
 		ApiResponseUserModel apiResponseUserModel = new ApiResponseUserModel(true, HttpStatus.CREATED.value(),
 				"Profile Image Uploaded Successfully", userModel);
@@ -215,14 +210,14 @@ public class UserController {
 //	            .body(image);
 //	}
 
-	@GetMapping(value = "{userId}/profileImage", produces = MediaType.IMAGE_JPEG_VALUE)
-	public void getProfileImage(@PathVariable("userId") Integer userId, HttpServletResponse response) throws Exception {
-
-		InputStream inputStream = this.userService.getUserProfileImage(userId);
-		response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-		StreamUtils.copy(inputStream, response.getOutputStream());
-
-	}
+//	@GetMapping(value = "{userId}/profileImage", produces = MediaType.IMAGE_JPEG_VALUE)
+//	public void getProfileImage(@PathVariable("userId") Integer userId, HttpServletResponse response) throws Exception {
+//
+//		InputStream inputStream = this.userService.getUserProfileImage(userId);
+//		response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+//		StreamUtils.copy(inputStream, response.getOutputStream());
+//
+//	}
 
 	@DeleteMapping("{userId}/profileImage")
 	public ResponseEntity<ApiResponseUserModel> deleteProfileImage(@PathVariable("userId") Integer userId)
@@ -239,10 +234,10 @@ public class UserController {
 			return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.OK);
 		}
 		
-		apiResponseUserModel = new ApiResponseUserModel(false, HttpStatus.NO_CONTENT.value(),
-				"Profile Image Not Found", null);
+		apiResponseUserModel = new ApiResponseUserModel(false, HttpStatus.NOT_FOUND.value(),
+				"Profile Image Doesn't Exist", null);
 
-		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.NO_CONTENT);
+		return new ResponseEntity<ApiResponseUserModel>(apiResponseUserModel, HttpStatus.NOT_FOUND);
 
 	}
 

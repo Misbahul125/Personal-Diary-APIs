@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -146,9 +144,7 @@ public class S3FileServiceImpl implements S3FileService {
 		
 		for(String fileURL : fileURLs) {
 			
-			String[] urlParts = fileURL.split("/");
-	        //String bucketName = urlParts[3];
-	        String objectKey = String.join("/", Arrays.copyOfRange(urlParts, 4, urlParts.length));
+	        String objectKey = fileURL.substring(fileURL.lastIndexOf('/')+1);
 	        
 	        // Create a DeleteObjectRequest with the bucket name and object key
 	        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucketName, objectKey);

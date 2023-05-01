@@ -1,15 +1,13 @@
 package com.collegegroup.personaldiary.services.implementations;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,19 +25,18 @@ import com.collegegroup.personaldiary.exceptions.ResourceNotFoundException;
 import com.collegegroup.personaldiary.payloads.user.ApiResponseUserModels;
 import com.collegegroup.personaldiary.payloads.user.UserModel;
 import com.collegegroup.personaldiary.repositories.UserRepository;
-import com.collegegroup.personaldiary.services.FileService;
+import com.collegegroup.personaldiary.services.S3FileService;
 import com.collegegroup.personaldiary.services.UserService;
 import com.collegegroup.personaldiary.utils.AESHelper;
-import com.collegegroup.personaldiary.utils.AppConstants;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-
+	
 	@Autowired
-	private FileService fileService;
+	private S3FileService s3FileService;
 
 	@Value("${project.image}")
 	private String path;
@@ -239,56 +236,55 @@ public class UserServiceImpl implements UserService {
 		this.userRepository.delete(userFromDB);
 	}
 
+	
 	// images
 
 	@Override
-	public UserModel createUserProfileImage(Integer userId, MultipartFile multipartFile) throws IOException {
+	public UserModel uploadUserProfileImage(Integer userId, MultipartFile multipartFile) throws IOException {
 
 		User user = this.userRepository.findById(userId)
 				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
 
+		//check if image already exists or not
+		//if so then delete the existing one
 		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
-			try {
-				boolean isImageDeleted = this.fileService.deleteImage(path, user.getImageURL());
-
-				if (!isImageDeleted)
-					return null;
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+			
+			List<String> fileURLsToBeDeleted = new ArrayList<>();
+			fileURLsToBeDeleted.add(user.getImageURL());
+			
+			this.s3FileService.deleteFiles(fileURLsToBeDeleted);
 		}
 
-		String fileName = this.fileService.uploadImageFile(path, multipartFile);
+		//upload new image
+		List<MultipartFile> multipartFiles = new ArrayList<>();
+		multipartFiles.add(multipartFile);
+		
+		List<String> savedFileURLs = this.s3FileService.saveFile(multipartFiles);
 
-//		System.out.println(AppConstants.USER_PROFILE_IMAGE_PATH);
-//		System.out.println(fileName);
-
-		user.setImageURL(fileName);
+		user.setImageURL(savedFileURLs.get(0));
 		User updatedUser = this.userRepository.save(user);
 
 		return this.modelMapper.map(updatedUser, UserModel.class);
 
 	}
 
-	@Override
-	public InputStream getUserProfileImage(Integer userId) throws Exception {
-
-		User user = this.userRepository.findById(userId)
-				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
-
-		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
-
-			InputStream inputStream = this.fileService.getResource(path, user.getImageURL());
-
-			return inputStream;
-
-		}
-
-		return null;
-
-	}
+//	@Override
+//	public InputStream getUserProfileImage(Integer userId) throws Exception {
+//
+//		User user = this.userRepository.findById(userId)
+//				.orElseThrow((() -> new ResourceNotFoundException("User", "user ID", userId.toString())));
+//
+//		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
+//
+//			InputStream inputStream = this.fileService.getResource(path, user.getImageURL());
+//
+//			return inputStream;
+//
+//		}
+//
+//		return null;
+//
+//	}
 	
 	public boolean deleteUserProfileImage(Integer userId) throws Exception {
 		
@@ -297,17 +293,19 @@ public class UserServiceImpl implements UserService {
 		
 		if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
 
-			boolean isImageDeleted = this.fileService.deleteImage(path, user.getImageURL());
+			List<String> fileURLsToBeDeleted = new ArrayList<>();
+			fileURLsToBeDeleted.add(user.getImageURL());
 
-			if(!isImageDeleted)
-				return false;
-
+			this.s3FileService.deleteFiles(fileURLsToBeDeleted);
+			
+			user.setImageURL(null);
+			this.userRepository.save(user);
+			
+			return true;
+			
 		}
 		
-		user.setImageURL(null);
-		this.userRepository.save(user);
-		
-		return true;
+		return false;
 		
 	}
 

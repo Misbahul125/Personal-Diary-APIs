@@ -17,13 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.collegegroup.personaldiary.entities.Gallery;
 import com.collegegroup.personaldiary.entities.GalleryImage;
-import com.collegegroup.personaldiary.entities.Note;
 import com.collegegroup.personaldiary.entities.User;
 import com.collegegroup.personaldiary.exceptions.ResourceNotFoundException;
 import com.collegegroup.personaldiary.payloads.Gallery.ApiResponseGalleryModels;
 import com.collegegroup.personaldiary.payloads.Gallery.GalleryModel;
-import com.collegegroup.personaldiary.payloads.Note.ApiResponseNoteModels;
-import com.collegegroup.personaldiary.payloads.Note.NoteModel;
 import com.collegegroup.personaldiary.repositories.GalleryImageRepository;
 import com.collegegroup.personaldiary.repositories.GalleryRepository;
 import com.collegegroup.personaldiary.repositories.UserRepository;
@@ -171,8 +168,8 @@ public class GalleryServiceImpl implements GalleryService {
 	}
 
 	@Override
-	public ApiResponseGalleryModels searchGalleriesByUserAndCaption(Integer userId, String searchKey, Integer pageNumber,
-			Integer pageSize, String sortBy, Integer sortMode) {
+	public ApiResponseGalleryModels searchGalleriesByUserAndCaption(Integer userId, String searchKey,
+			Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode) {
 
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
@@ -207,8 +204,8 @@ public class GalleryServiceImpl implements GalleryService {
 	}
 
 	@Override
-	public ApiResponseGalleryModels searchGalleriesByUserAndDescription(Integer userId, String searchKey, Integer pageNumber,
-			Integer pageSize, String sortBy, Integer sortMode) {
+	public ApiResponseGalleryModels searchGalleriesByUserAndDescription(Integer userId, String searchKey,
+			Integer pageNumber, Integer pageSize, String sortBy, Integer sortMode) {
 
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "UserId", userId.toString()));
@@ -220,7 +217,8 @@ public class GalleryServiceImpl implements GalleryService {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
 		// retrieving paged data items
-		Page<Gallery> pageGalleries = this.galleryRepository.findByUserAndDescriptionContaining(user, searchKey, pageable);
+		Page<Gallery> pageGalleries = this.galleryRepository.findByUserAndDescriptionContaining(user, searchKey,
+				pageable);
 
 		List<Gallery> allGalleries = pageGalleries.getContent();
 
@@ -249,18 +247,25 @@ public class GalleryServiceImpl implements GalleryService {
 		Gallery gallery = this.galleryRepository.findById(galleryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Gallery", "galleryId", galleryId.toString()));
 
-		GalleryImage galleryImage = this.galleryImageRepository.findById(galleryImageId).orElseThrow(
-				() -> new ResourceNotFoundException("Gallery Image", "galleryImageId", galleryImageId.toString()));
-
 		// check if update action contains any file or not
-		if (galleryImage.getImageURL() != null && !galleryImage.getImageURL().isEmpty() && multipartFile != null) {
+		if (galleryImageId != null) {
 
-			String updateFileURL = this.s3FileService.updateFile(galleryImage.getImageURL(), multipartFile);
+			GalleryImage galleryImage = this.galleryImageRepository.findById(galleryImageId).orElseThrow(
+					() -> new ResourceNotFoundException("Gallery Image", "galleryImageId", galleryImageId.toString()));
 
-			galleryImage.setImageURL(updateFileURL);
-			galleryImage.setUpdatedAt(new Date());
+			if (galleryImage.getImageURL() != null && !galleryImage.getImageURL().isEmpty() && multipartFile != null) {
 
-			this.galleryImageRepository.save(galleryImage);
+				String updateFileURL = this.s3FileService.updateFile(galleryImage.getImageURL(), multipartFile);
+
+				galleryImage.setImageURL(updateFileURL);
+				galleryImage.setUpdatedAt(new Date());
+
+				this.galleryImageRepository.save(galleryImage);
+
+			}
+			else {
+				throw new ResourceNotFoundException("Gallery Image", "galleryImageId", galleryImageId.toString());
+			}
 
 		}
 
@@ -302,7 +307,10 @@ public class GalleryServiceImpl implements GalleryService {
 	}
 
 	@Override
-	public void deleteGalleryImageById(Integer galleryImageId) {
+	public GalleryModel deleteGalleryImageById(Integer galleryId, Integer galleryImageId) {
+		
+		this.galleryRepository.findById(galleryId)
+				.orElseThrow(() -> new ResourceNotFoundException("Gallery", "galleryId", galleryId.toString()));
 
 		GalleryImage galleryImage = this.galleryImageRepository.findById(galleryImageId).orElseThrow(
 				() -> new ResourceNotFoundException("Gallery Image", "galleryImageId", galleryImageId.toString()));
@@ -315,6 +323,11 @@ public class GalleryServiceImpl implements GalleryService {
 
 		if (isDeleted)
 			this.galleryImageRepository.delete(galleryImage);
+		
+		Gallery updatedGallery = this.galleryRepository.findById(galleryId)
+		.orElseThrow(() -> new ResourceNotFoundException("Gallery", "galleryId", galleryId.toString()));
+		
+		return this.modelMapper.map(updatedGallery, GalleryModel.class);
 
 	}
 

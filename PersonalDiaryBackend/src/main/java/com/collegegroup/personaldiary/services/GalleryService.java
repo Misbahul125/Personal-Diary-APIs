@@ -28,6 +28,6 @@ public interface GalleryService {
 	
 	public void deleteGalleryById(Integer galleryId);
 	
-	public void deleteGalleryImageById(Integer galleryImageId);
+	public GalleryModel deleteGalleryImageById(Integer galleryId, Integer galleryImageId);
 	
 }

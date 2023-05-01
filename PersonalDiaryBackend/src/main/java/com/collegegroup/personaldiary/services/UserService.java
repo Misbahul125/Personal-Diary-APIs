@@ -1,7 +1,6 @@
 package com.collegegroup.personaldiary.services;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,9 +35,9 @@ public interface UserService {
 	
 	//images
 
-	public UserModel createUserProfileImage(Integer userId, MultipartFile multipartFile) throws IOException;
+	public UserModel uploadUserProfileImage(Integer userId, MultipartFile multipartFile) throws IOException;
 
-	public InputStream getUserProfileImage(Integer userId) throws Exception;
+	//public InputStream getUserProfileImage(Integer userId) throws Exception;
 	
 	public boolean deleteUserProfileImage(Integer userId) throws Exception;
 
