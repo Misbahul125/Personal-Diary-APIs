@@ -40,11 +40,19 @@ public class UserController {
 	public ResponseEntity<ApiResponseEmailVerification> sendOTP(@Valid @RequestBody EmailRequest emailRequest) {
 
 		EmailVerificationResponse emailVerificationResponse = this.userService.sendOTP(emailRequest);
-
-		ApiResponseEmailVerification apiResponseEmailVerification = new ApiResponseEmailVerification(true,
-				HttpStatus.CREATED.value(), "Email Sent Successfully", emailVerificationResponse);
-
-		return new ResponseEntity<ApiResponseEmailVerification>(apiResponseEmailVerification, HttpStatus.CREATED);
+		
+		ApiResponseEmailVerification apiResponseEmailVerification = null;
+		
+		if(emailVerificationResponse.getVerificationCode() != null && !emailVerificationResponse.getVerificationCode().isEmpty()) {
+			apiResponseEmailVerification = new ApiResponseEmailVerification(true,
+					HttpStatus.CREATED.value(), "Email Sent Successfully", emailVerificationResponse);
+			return new ResponseEntity<ApiResponseEmailVerification>(apiResponseEmailVerification, HttpStatus.CREATED);
+		}
+		else {
+			apiResponseEmailVerification = new ApiResponseEmailVerification(true,
+					HttpStatus.BAD_REQUEST.value(), "Email cannot be sent", emailVerificationResponse);
+			return new ResponseEntity<ApiResponseEmailVerification>(apiResponseEmailVerification, HttpStatus.BAD_REQUEST);
+		}
 
 	}
 

@@ -67,9 +67,17 @@ public class UserServiceImpl implements UserService {
 		EmailHelper emailHelper = new EmailHelper();
 
 		String code = emailHelper.sendEmail(emailRequest);
-
-		EmailVerificationResponse emailVerificationResponse = new EmailVerificationResponse(code,
-				"Veification Code is sent successfully !!");
+		
+		EmailVerificationResponse emailVerificationResponse = null;
+		
+		if(code != null && !code.isEmpty()) {
+			emailVerificationResponse = new EmailVerificationResponse(code,
+					"Veification Code is sent successfully !!");
+		}
+		else {
+			emailVerificationResponse = new EmailVerificationResponse(null,
+					"Something went wrong. Unable to send veification code !!");
+		}
 
 		return emailVerificationResponse;
 

@@ -3,12 +3,16 @@ package com.collegegroup.personaldiary.exceptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.AuthenticationFailedException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.collegegroup.personaldiary.emailHelper.ApiResponseEmailVerification;
 
 @RestControllerAdvice  //used for global exception handling as it checks all controllers present.
 public class GlobalExceptionHandler {
@@ -41,5 +45,12 @@ public class GlobalExceptionHandler {
 	{
 		ApiResponseCredentialException apiResponse = new ApiResponseCredentialException(true, HttpStatus.BAD_REQUEST.value(), exception.getMessage());
 		return new ResponseEntity<ApiResponseCredentialException>(apiResponse,HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(AuthenticationFailedException.class)
+	public ResponseEntity<ApiResponseEmailVerification> credentialNotFoundExceptionHandler(AuthenticationFailedException exception)
+	{
+		ApiResponseEmailVerification apiResponse = new ApiResponseEmailVerification(true, HttpStatus.BAD_REQUEST.value(), exception.getMessage(), null);
+		return new ResponseEntity<ApiResponseEmailVerification>(apiResponse,HttpStatus.BAD_REQUEST);
 	}
 }
