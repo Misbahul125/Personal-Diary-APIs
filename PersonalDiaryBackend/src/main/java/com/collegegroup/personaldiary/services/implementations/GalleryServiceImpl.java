@@ -309,7 +309,7 @@ public class GalleryServiceImpl implements GalleryService {
 	@Override
 	public GalleryModel deleteGalleryImageById(Integer galleryId, Integer galleryImageId) {
 		
-		this.galleryRepository.findById(galleryId)
+		Gallery gallery = galleryRepository.findById(galleryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Gallery", "galleryId", galleryId.toString()));
 
 		GalleryImage galleryImage = this.galleryImageRepository.findById(galleryImageId).orElseThrow(

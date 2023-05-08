@@ -41,5 +41,7 @@ public class UserModel {
 	
 	@NotEmpty(message = "About cannot be empty !!")
 	private String about;
+	
+	private boolean isGallerySubscribed;
 
 }

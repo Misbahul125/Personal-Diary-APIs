@@ -44,6 +44,8 @@ public class User {
 	
 	private String about;
 	
+	private boolean isGallerySubscribed;
+	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Note> notes;
 	
@@ -52,6 +54,12 @@ public class User {
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Gallery> galleries;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Feedback> feedbacks;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<PaymentDetails> paymentDetails;
 
 }
 

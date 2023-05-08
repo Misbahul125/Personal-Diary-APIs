@@ -92,6 +92,8 @@ public class UserServiceImpl implements UserService {
 		}
 
 		User createdUser = this.modelMapper.map(userModel, User.class);
+		
+		createdUser.setGallerySubscribed(false);
 
 		createdUser = this.userRepository.save(createdUser);
 
